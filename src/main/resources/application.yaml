@@ -1,0 +1,99 @@
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    properties:
+      applicationName: lumini
+  main:
+    banner-mode: off
+    web-application-type: reactive
+    cloud-platform: kubernetes
+  webflux:
+    problemdetails:
+      enabled: true
+    format:
+      time: iso
+      date: iso
+      date-time: iso
+  flyway:
+    password: postgres
+    user: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+  cloud:
+    azure:
+      servicebus:
+        connection-string: ${AZURE_SERVICEBUS_NAMESPACE}
+        consumer:
+          session-enabled: true
+    stream:
+      bindings:
+        task-in-0:
+          destination: task
+        task-in-1:
+          destination: task
+        supply1-out-0:
+          destination: task
+        supply2-out-0:
+          destination: task
+      servicebus:
+        bindings:
+          task-in-0:
+            consumer:
+              requeue-rejected: true
+              auto-complete: false
+          task-in-1:
+            consumer:
+              subQueue: dead_letter_queue
+              entityType: queue
+              auto-complete: false
+          supply1-out-0:
+            producer:
+              entity-type: queue
+          supply2-out-0:
+            producer:
+              entity-type: queue
+    function:
+      definition: task; supply1; supply2;
+  integration:
+    poller:
+      initial-delay: 0
+      fixed-delay: 1000
+  profiles:
+    active: ${@spring.profiles.active@:development}
+logging:
+  level:
+    org:
+      springframework:
+        validation: INFO
+        r2dbc: INFO
+    io.r2dbc.postgresql.QUERY: INFO # for queries
+    io.r2dbc.postgresql.PARAM: INFO # for parameters
+    web: info
+server:
+  error:
+    whitelabel:
+      enabled: false
+    include-binding-errors: always
+    include-exception: off
+    include-stacktrace: never
+  compression:
+    enabled: true
+    min-response-size: 1024
+  http2:
+    enabled: true
+  forward-headers-strategy: framework
+  port: 9191
+springdoc:
+  show-actuator: true
+  api-docs:
+    version: openapi_3_1
+  swagger-ui:
+    use-root-path: true
+management:
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        add-additional-paths: true
