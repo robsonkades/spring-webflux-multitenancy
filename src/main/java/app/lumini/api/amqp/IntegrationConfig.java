@@ -15,7 +15,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Configuration
+//@Configuration
 public class IntegrationConfig {
 
     private final static Logger log = LoggerFactory.getLogger(IntegrationConfig.class);
@@ -42,7 +42,6 @@ public class IntegrationConfig {
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 // Lógica de interceptação antes da mensagem ser enviada para o consumidor
                 //return MessageBuilder.withPayload(message.getPayload().toString().toUpperCase()).copyHeadersIfAbsent(message.getHeaders()).build();
-                log.info("A");
                 return CloudEventMessageBuilder.withData(message.getPayload())
                         .setHeader("X-TenantId", UUID.randomUUID().toString())
                         .copyHeaders(message.getHeaders())

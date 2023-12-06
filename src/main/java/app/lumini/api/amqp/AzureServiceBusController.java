@@ -17,20 +17,34 @@ import java.util.UUID;
 @RestController
 public class AzureServiceBusController {
 
+//    @Autowired
+//    private Sinks.Many<Message<Notify>> many;
+
     @Autowired
-    private Sinks.Many<Message<Notify>> many;
+    private Sinks.Many<Message<Company>> many;
 
     @PostMapping("/messages")
     public ResponseEntity<String> sendMessage(@RequestParam String message) {
 
-        Notify notify = new Notify();
-        notify.setId(UUID.randomUUID());
-        notify.setMessage(message);
+//        Notify notify = new Notify();
+//        notify.setId(UUID.randomUUID());
+//        notify.setMessage(message);
+//
+//
+//        Message<Notify> build = MessageBuilder
+//                .withPayload(notify)
+//                .setHeader(AzureHeaders.SCHEDULED_ENQUEUE_MESSAGE, 30000)
+//                .build();
 
+        TenantThreadLocalContext.set("tenant1");
 
-        Message<Notify> build = MessageBuilder
-                .withPayload(notify)
-                .setHeader(AzureHeaders.SCHEDULED_ENQUEUE_MESSAGE, 30000)
+        Company company = new Company();
+        company.setId(UUID.randomUUID());
+        company.setMessage(message);
+
+        Message<Company> build = MessageBuilder
+                .withPayload(company)
+                //.setHeader(AzureHeaders.SCHEDULED_ENQUEUE_MESSAGE, 3000)
                 .build();
 
         many.emitNext(build, Sinks.EmitFailureHandler.FAIL_FAST);

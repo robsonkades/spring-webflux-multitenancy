@@ -32,10 +32,10 @@
         <Logger name="org.springframework.boot.actuate.endpoint.jmx" level="warn"/>
         <Logger name="com.azure" level="warn" />
         <Root level="info">
-            <SpringProfile name="development">
+            <SpringProfile name="development|test">
                 <AppenderRef ref="development" />
             </SpringProfile>
-            <SpringProfile name="production">
+            <SpringProfile name="default">
                 <AppenderRef ref="production"/>
             </SpringProfile>
         </Root>

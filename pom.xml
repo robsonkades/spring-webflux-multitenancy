@@ -17,7 +17,7 @@
     <properties>
         <java.version>21</java.version>
         <log4j-layout-template-json.version>2.20.0</log4j-layout-template-json.version>
-        <spring-cloud-azure-dependencies.version>5.6.0</spring-cloud-azure-dependencies.version>
+        <spring-cloud-azure-dependencies.version>5.7.0</spring-cloud-azure-dependencies.version>
         <springdoc-openapi-starter-webflux.version>2.2.0</springdoc-openapi-starter-webflux.version>
         <blockhound.version>1.0.8.RELEASE</blockhound.version>
     </properties>
