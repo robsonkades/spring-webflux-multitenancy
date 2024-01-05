@@ -13,19 +13,12 @@
     "$resolver": "message",
     "stringified": true
   },
-  "mdc": {
-    "$resolver": "mdc",
-    "flatten": true,
-    "stringified": true
+  "contextMap": {
+    "$resolver": "mdc"
   },
   "thread": {
     "$resolver": "thread",
     "field": "name"
-  },
-  "correlationId": "${ctx:correlationId}",
-  "dd": {
-    "trace_id": "${ctx:dd.trace_id}",
-    "span_id": "${ctx:dd.span_id}"
   },
   "tags": {
     "$resolver": "ndc"

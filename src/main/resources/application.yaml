@@ -1,5 +1,7 @@
 
 spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 2m
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/postgres
     username: postgres
@@ -25,14 +27,17 @@ spring:
     azure:
       servicebus:
         connection-string: ${AZURE_SERVICEBUS_NAMESPACE}
-        consumer:
-          session-enabled: true
     stream:
       bindings:
         companyUpdated-out-0:
           destination: company-updated-queue
+          content-type: application/json
         companyUpdatedConsumer-in-0:
           destination: company-updated-queue
+          content-type: application/json
+          consumer:
+            concurrency: 20
+            max-attempts: 0
         companyUpdatedDlqConsumer-in-0:
           destination: company-updated-queue/$DeadLetterQueue
       servicebus:
@@ -42,9 +47,14 @@ spring:
               entity-type: queue
           companyUpdatedConsumer-in-0:
             consumer:
+
+              maxConcurrentCalls: 20
+              maxConcurrentSessions: 20
               requeue-rejected: false
               auto-complete: false
               entityType: queue
+              prefetchCount: 10
+
 #          companyUpdatedDlqConsumer-in-0:
 #            consumer:
 #              requeue-rejected: true
@@ -53,46 +63,16 @@ spring:
 
     function:
       definition: companyUpdated; companyUpdatedConsumer;
-#    stream:
-#      bindings:
-#        task-in-0:
-#          destination: task
-#        task-in-1:
-#          destination: task
-#        supply1-out-0:
-#          destination: task
-#        supply2-out-0:
-#          destination: task
-#      servicebus:
-#        bindings:
-#          task-in-0:
-#            consumer:
-#              requeue-rejected: true
-#              auto-complete: false
-#          task-in-1:
-#            consumer:
-#              subQueue: dead_letter_queue
-#              entityType: queue
-#              auto-complete: false
-#          supply1-out-0:
-#            producer:
-#              entity-type: queue
-#          supply2-out-0:
-#            producer:
-#              entity-type: queue
-#    function:
-#      definition: task; supply1; supply2;
+      expected-content-type:
   integration:
     poller:
-      initial-delay: 0
-      fixed-delay: 1000
+      initial-delay: 30000
+      fixed-delay: 60000
+      max-messages-per-poll: 10
 
-
-  sleuth:
-    reactor:
-      instrumentation-type: decorate_on_each
-  #  profiles:
-#    active: ${@spring.profiles.active@:development}
+  jackson:
+    serialization:
+      WRITE_DURATIONS_AS_TIMESTAMPS: false
 
 logging:
   level:
@@ -120,6 +100,7 @@ server:
     enabled: true
   forward-headers-strategy: framework
   port: 9191
+  shutdown: graceful
 springdoc:
   show-actuator: true
   api-docs:
@@ -128,8 +109,13 @@ springdoc:
     use-root-path: true
 management:
   endpoint:
+    shutdown:
+      enabled: true
     health:
       show-details: always
       probes:
         add-additional-paths: true
-
+  endpoints:
+    web:
+      exposure:
+        include: health, shutdown, bindings

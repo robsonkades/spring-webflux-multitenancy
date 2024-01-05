@@ -30,7 +30,7 @@
         <Logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="error" />
         <Logger name="org.hibernate.validator.internal.util.Version" level="warn" />
         <Logger name="org.springframework.boot.actuate.endpoint.jmx" level="warn"/>
-        <Logger name="com.azure" level="warn" />
+<!--        <Logger name="com.azure" level="warn" />-->
         <Root level="info">
             <SpringProfile name="development|test">
                 <AppenderRef ref="development" />

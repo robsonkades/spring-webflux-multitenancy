@@ -12,6 +12,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -27,7 +28,7 @@ public class AzureServiceBus {
 
     @Bean
     public Sinks.Many<Message<Company>> many() {
-        return Sinks.many().multicast().directBestEffort();
+        return Sinks.unsafe().many().multicast().onBackpressureBuffer();
     }
 
 
@@ -43,24 +44,28 @@ public class AzureServiceBus {
                 .doOnError(t -> LOGGER.error("Error encountered", t));
     }
 
-    @Bean
-    public Consumer<Message<Company>> companyUpdatedConsumer() {
-        return message -> {
-            try {
-                Checkpointer checkpointer = (Checkpointer) message.getHeaders().get(AzureHeaders.CHECKPOINTER);
-                String tenant = (String) message.getHeaders().get("tenant");
-                TenantThreadLocalContext.set(tenant);
-
-                checkpointer.success()
-                        .doOnSuccess(s -> LOGGER.info("companyUpdatedConsumer '{}' successfully checkpointed", message.getPayload()))
-                        .doOnError(e -> LOGGER.error("Error found", e))
-                        .subscribe();
-            }finally {
-                TenantThreadLocalContext.unset();
-            }
-
-        };
-    }
+//   @Bean
+//    public Consumer<Message<Company>> companyUpdatedConsumer() {
+//        return message -> {
+//            try {
+//                Checkpointer checkpointer = message.getHeaders().get(AzureHeaders.CHECKPOINTER, Checkpointer.class);
+//                String tenant = message.getHeaders().get("tenant", String.class);
+//                TenantThreadLocalContext.set(tenant);
+//
+//                TimeUnit.SECONDS.sleep(5);
+//
+//                checkpointer.success()
+//                        .doOnSuccess(s -> LOGGER.info("companyUpdatedConsumer '{}' successfully checkpointed", message.getPayload()))
+//                        .doOnError(e -> LOGGER.error("Error found", e))
+//                        .subscribe();
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            } finally {
+//                TenantThreadLocalContext.unset();
+//            }
+//
+//        };
+//    }
 
 //    @Bean
 //    public Consumer<ErrorMessage> myDefaultHandler() {
