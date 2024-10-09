@@ -27,6 +27,10 @@ spring:
     azure:
       servicebus:
         connection-string: ${AZURE_SERVICEBUS_NAMESPACE}
+        retry:
+          mode: fixed
+          fixed:
+            max-retries: 50
     stream:
       bindings:
         companyUpdated-out-0:
